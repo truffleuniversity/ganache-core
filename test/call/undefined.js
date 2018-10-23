@@ -105,4 +105,12 @@ describe('call:undefined', function() {
 
     assert.equal(result, "0x");
   });
+
+  it.only("should return account[0] as coinbase", async () => {
+    const {instance, accounts} = context;
+
+    const result = await instance.methods.getCoinbase().call();
+
+    assert.equal(result, accounts[0].address);
+  });
 });

@@ -11,4 +11,8 @@ contract Call {
     require(false);
     return true;
   }
+  
+  function getCoinbase() public returns (address){
+    return block.coinbase;
+  }
 }
