@@ -3,8 +3,7 @@ const bootstrap = require("../helpers/contract/bootstrap");
 const randomInteger = require("../helpers/utils/generateRandomInteger");
 
 const SEED_RANGE = 1000000;
-// const TARGETS = [ "ganache", "geth", "parity" ];
-const TARGETS = ["ganache"];
+const TARGETS = ["ganache", "geth", "parity"];
 
 TARGETS.forEach((simulator) => {
   describe(`SIMULATOR: ${simulator.toUpperCase()}`, function() {
@@ -25,16 +24,14 @@ TARGETS.forEach((simulator) => {
           seed
         };
 
-        const simulatorOptions = { name: simulator };
-
-        context = await bootstrap(contractRef, ganacheProviderOptions, simulatorOptions);
+        context = await bootstrap(contractRef, ganacheProviderOptions, simulator);
       });
 
       const iterations = 10 ** 6;
       const clientGasLimit = 10 ** 8;
 
       if (simulator === "ganache") {
-        it("should NOT generate a block gas limit error when calling a 'view' function", async function() {
+        it("GANACHE ONLY:should NOT generate a block gas limit error when calling a 'view' function", async function() {
           const { instance, web3 } = context;
           const block = await web3.eth.getBlock("latest");
 
@@ -52,7 +49,7 @@ TARGETS.forEach((simulator) => {
       }
 
       if (simulator === "ganache") {
-        it("when calling a 'pure' function should generate a block gas limit error", async function() {
+        it("GANACHE ONLY: when calling a 'pure' function should generate a block gas limit error", async function() {
           const { instance, web3 } = context;
           const block = await web3.eth.getBlock("latest");
 
