@@ -14,7 +14,6 @@ const initializeTestProvider = async(options = {}, simulator = "ganache") => {
   switch (simulator) {
     case "geth":
       provider = new Web3.providers.HttpProvider("http://localhost:9711");
-      // provider = new Web3.providers.HttpProvider("http://travis_ci_geth:8545");
       web3 = new Web3(provider);
       accounts = await web3.eth.getAccounts();
       break;
