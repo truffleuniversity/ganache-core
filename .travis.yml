@@ -26,4 +26,5 @@ before_install:
   - g++ --version
 
 after_success:
+  npm run test-providers
   npm run coverage
