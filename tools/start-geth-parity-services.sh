@@ -29,5 +29,5 @@ echo "Done testing against Ganache, Geth and Parity!"
 # Kill Geth and Parity processes
 ps -ef | grep ethnode/geth | grep -v grep | awk '{print $2}' | xargs kill &> /dev/null
 ps -ef | grep ethnode/parity | grep -v grep | awk '{print $2}' | xargs kill &> /dev/null
-
+rm -rf $TEMP_ETHNODE
 exit 0
