@@ -1,6 +1,6 @@
 const { join } = require("path");
 const { compileAndDeploy } = require("./compileAndDeploy");
-const initializeTestProvider = require("../web3/initializeTestProvider");
+const initializeTestProvider = require("../providers/initializeTestProvider");
 
 /**
  * @param {Object} contractRef Object containing contract files and subdirectory path
