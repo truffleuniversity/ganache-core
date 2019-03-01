@@ -4,6 +4,7 @@ var Ganache = require(process.env.TEST_BUILD
   : "../index.js");
 var assert = require("assert-match");
 var regex = require("assert-match/matchers").regex;
+const testWithServerInstance = require("./helpers/providers/initializeTestServer");
 
 var tests = function(web3) {
   var accounts;
@@ -192,22 +193,4 @@ describe("Provider:", function() {
   tests(web3);
 });
 
-describe("Server:", function(done) {
-  var web3 = new Web3();
-  var port = 12345;
-  var server;
-
-  before("Initialize Ganache server", function(done) {
-    server = Ganache.server({});
-    server.listen(port, function() {
-      web3.setProvider(new Web3.providers.HttpProvider("http://localhost:" + port));
-      done();
-    });
-  });
-
-  after("Shutdown server", function(done) {
-    server.close(done);
-  });
-
-  tests(web3);
-});
+describe("Server:", testWithServerInstance(tests));
