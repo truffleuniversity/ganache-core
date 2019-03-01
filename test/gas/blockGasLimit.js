@@ -6,7 +6,7 @@ const SEED_RANGE = 1000000;
 const TARGETS = ["ganache", "geth", "parity"];
 
 TARGETS.forEach((simulator) => {
-  describe.skip(`SIMULATOR: ${simulator.toUpperCase()}`, function() {
+  describe.only(`SIMULATOR: ${simulator.toUpperCase()}`, function() {
     describe("Specifying a sender gas limit greater than block gas limitations", function() {
       let context;
       const seed = randomInteger(SEED_RANGE);
