@@ -1,10 +1,10 @@
 var Web3 = require("web3");
-var Web3WsProvider = require("web3-providers-ws");
 var Ganache = require(process.env.TEST_BUILD
   ? "../build/ganache.core." + process.env.TEST_BUILD + ".js"
   : "../index.js");
 var assert = require("assert");
 var solc = require("solc");
+const testWithServerInstance = require("./helpers/providers/initializeTestServer");
 
 var source =
   "                      \n" +
@@ -296,32 +296,10 @@ describe("Provider:", function() {
   var web3 = new Web3();
   web3.setProvider(
     Ganache.provider({
-      logger: logger
+      logger
     })
   );
   tests(web3);
 });
 
-describe("Server:", function(done) {
-  var web3 = new Web3();
-  var port = 12345;
-  var server;
-
-  before("Initialize Ganache server", function(done) {
-    server = Ganache.server({
-      logger: logger,
-      ws: true
-    });
-    server.listen(port, function() {
-      web3.setProvider(new Web3WsProvider("ws://localhost:" + port));
-      done();
-    });
-  });
-
-  tests(web3);
-
-  after("Shutdown server", function(done) {
-    web3._provider.connection.close();
-    server.close(done);
-  });
-});
+describe("Server:", testWithServerInstance(tests, { logger, ws: true }));
