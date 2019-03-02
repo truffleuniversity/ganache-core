@@ -1,11 +1,13 @@
 const assert = require("assert");
-const Ganache = require("../index.js");
 const request = require("request");
-const pify = require("pify");
+const runTestsWithServer = require("./helpers/providers/initializeTestServer");
 
 const customRequestHeader = "X-PINGOTHER";
 
-function test(host, port) {
+function test() {
+  const host = "localhost";
+  const port = 12345;
+
   describe("CORS", () => {
     it("should set response headers correctly in a preflight request", (done) => {
       let req = request.options(
@@ -113,19 +115,4 @@ function test(host, port) {
   });
 }
 
-describe("HTTP Server:", function() {
-  const host = "localhost";
-  const port = 12345;
-  let server;
-
-  before("Initialize Ganache server", async function() {
-    server = Ganache.server();
-    await pify(server.listen)(port);
-  });
-
-  after("Shutdown server", async function() {
-    await pify(server.close)();
-  });
-
-  test(host, port);
-});
+describe.only("HTTP Server:", runTestsWithServer(test));
