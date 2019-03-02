@@ -124,7 +124,7 @@ describe("HTTP Server:", function() {
   });
 
   after("Shutdown server", async function() {
-    await pify(server.close)();
+    await pify(server.close.bind(server))();
   });
 
   test(host, port);

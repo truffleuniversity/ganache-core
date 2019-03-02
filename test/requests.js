@@ -1595,7 +1595,7 @@ describe("HTTP Server:", function() {
   });
 
   after("Shutdown server", async function() {
-    await pify(server.close)();
+    await pify(server.close.bind(server))();
   });
 
   tests(web3);
@@ -1624,6 +1624,6 @@ describe("WebSockets Server:", function() {
     let provider = web3._provider;
     web3.setProvider();
     provider.connection.close();
-    await pify(server.close)();
+    await pify(server.close.bind(server))();
   });
 });
