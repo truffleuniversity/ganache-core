@@ -16,11 +16,11 @@ const initializeTestServer = (tests, options = {}, port = 12345) => {
 
     before("Initialize Ganache server", function(done) {
       server = Ganache.server(options);
-      server.listen(port, function() {
+      server.listen(port, async function() {
         if (options.ws) {
-          web3.setProvider(new Web3WsProvider("ws://localhost:" + port));
+          web3.setProvider(new Web3WsProvider(`ws://localhost:${port}`));
         } else {
-          web3.setProvider(new Web3.providers.HttpProvider("http://localhost:" + port));
+          web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${port}`));
         }
         done();
       });

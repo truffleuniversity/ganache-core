@@ -1,6 +1,5 @@
 const Web3 = require("web3");
 const BN = Web3.utils.BN;
-const Web3WsProvider = require("web3-providers-ws");
 const Transaction = require("../lib/utils/transaction");
 const BlockHeader = require("ethereumjs-block/header");
 const utils = require("ethereumjs-util");
@@ -13,6 +12,7 @@ const fs = require("fs");
 const to = require("../lib/utils/to");
 const _ = require("lodash");
 const pify = require("pify");
+const runTestsWithServer = require("./helpers/providers/initializeTestServer");
 
 const source = fs.readFileSync("./test/contracts/examples/Example.sol", { encoding: "utf8" });
 const compilationResult = solc.compile(source, 1);
@@ -1553,9 +1553,7 @@ const tests = function(web3) {
 };
 
 const logger = {
-  log: function(message) {
-    // console.log(message);
-  }
+  log: function(message) {}
 };
 
 describe("Provider:", function() {
@@ -1577,53 +1575,19 @@ describe("Provider:", function() {
   });
 });
 
-describe("HTTP Server:", function() {
-  const Web3 = require("web3");
-  const web3 = new Web3();
-  const port = 12345;
-  let server;
+describe(
+  "HTTP Server:",
+  runTestsWithServer(tests, {
+    logger,
+    seed: "1337"
+  })
+);
 
-  before("Initialize Ganache server", async function() {
-    server = Ganache.server({
-      logger: logger,
-      seed: "1337"
-      // so that the runtime errors on call test passes
-    });
-
-    await pify(server.listen)(port);
-    web3.setProvider(new Web3.providers.HttpProvider("http://localhost:" + port));
-  });
-
-  after("Shutdown server", async function() {
-    await pify(server.close)();
-  });
-
-  tests(web3);
-});
-
-describe("WebSockets Server:", function() {
-  const Web3 = require("web3");
-  const web3 = new Web3();
-  const port = 12345;
-  let server;
-
-  before("Initialize Ganache server", async function() {
-    server = Ganache.server({
-      logger: logger,
-      seed: "1337"
-      // so that the runtime errors on call test passes
-    });
-    await pify(server.listen)(port);
-    const provider = new Web3WsProvider("ws://localhost:" + port);
-    web3.setProvider(provider);
-  });
-
-  tests(web3);
-
-  after("Shutdown server", async function() {
-    let provider = web3._provider;
-    web3.setProvider();
-    provider.connection.close();
-    await pify(server.close)();
-  });
-});
+describe(
+  "WebSockets Server:",
+  runTestsWithServer(tests, {
+    logger,
+    seed: "1337",
+    ws: true
+  })
+);
