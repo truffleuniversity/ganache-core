@@ -1,12 +1,6 @@
-const Ganache = require(process.env.TEST_BUILD
-  ? "../build/ganache.core." + process.env.TEST_BUILD + ".js"
-  : "../index.js");
-const send = require("./helpers/utils/rpc");
-const promisify = require("pify");
 const assert = require("assert");
-const PORT = 8545;
-const HOST = "127.0.0.1";
-const HTTPADDRESS = `http://${HOST}:${PORT}`;
+const runTestWithServer = require("./helpers/providers/initializeTestServer");
+const send = require("./helpers/utils/rpc");
 
 const testHttp = function(web3) {
   let web3send;
@@ -57,47 +51,5 @@ const testWebSocket = function(web3) {
   });
 };
 
-describe("WebSockets Server:", function() {
-  const Web3 = require("web3");
-  const web3 = new Web3();
-  let server;
-
-  before("Initialize Ganache server", async function() {
-    server = Ganache.server({
-      seed: "1337"
-    });
-    await promisify(server.listen)(PORT + 1);
-    const provider = new Web3.providers.WebsocketProvider("ws://localhost:" + (PORT + 1));
-    web3.setProvider(provider);
-  });
-
-  testWebSocket(web3);
-
-  after("Shutdown server", async function() {
-    let provider = web3._provider;
-    web3.setProvider();
-    provider.connection.close();
-    await promisify(server.close)();
-  });
-});
-
-describe("HTTP Server should not handle subscriptions:", function() {
-  const Web3 = require("web3");
-  const web3 = new Web3();
-  let server;
-
-  before("Initialize Ganache server", async function() {
-    server = Ganache.server({
-      seed: "1337"
-    });
-
-    await promisify(server.listen)(PORT);
-    web3.setProvider(new Web3.providers.HttpProvider(HTTPADDRESS));
-  });
-
-  testHttp(web3);
-
-  after("Shutdown server", async function() {
-    await promisify(server.close)();
-  });
-});
+describe("HTTP Server should not handle subscriptions:", runTestWithServer(testHttp), 8545);
+describe("WebSockets Server:", runTestWithServer(testWebSocket, { seed: 1337, ws: true }), 8546);
