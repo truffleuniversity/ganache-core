@@ -1556,38 +1556,21 @@ const logger = {
   log: function(message) {}
 };
 
-describe("Provider:", function() {
-  const Web3 = require("web3");
-  const web3 = new Web3();
-  web3.setProvider(
-    Ganache.provider({
-      logger: logger,
-      seed: "1337"
-      // so that the runtime errors on call test passes
-    })
-  );
+describe("Provider:", async function() {
+  const provider = Ganache.provider({
+    logger,
+    seed: "1337"
+  });
+
+  const web3 = new Web3(provider);
+
   tests(web3);
 
   after("shutdown provider", async function() {
-    const provider = web3._provider;
-    web3.setProvider();
     await pify(provider.close)();
   });
 });
 
-describe(
-  "HTTP Server:",
-  runTestsWithServer(tests, {
-    logger,
-    seed: "1337"
-  })
-);
+describe("HTTP Server:", runTestsWithServer(tests, { logger, seed: "1337" }));
 
-describe(
-  "WebSockets Server:",
-  runTestsWithServer(tests, {
-    logger,
-    seed: "1337",
-    ws: true
-  })
-);
+describe("WebSockets Server:", runTestsWithServer(tests, { logger, seed: "1337", ws: true }));
