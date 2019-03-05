@@ -134,11 +134,11 @@ describe("Mining", function() {
     await stopMining();
     let blockNumber = await getBlockNumber();
 
-    let tx1 = await queueTransaction(accounts[0], accounts[1], 90000, web3.utils.toWei(new BN(2), "ether"));
+    let tx1 = await queueTransaction(accounts[0], accounts[1], 90000, to.wei(new BN(2), "ether"));
     let receipt1 = await web3.eth.getTransactionReceipt(tx1);
     assert.strictEqual(receipt1, null);
 
-    let tx2 = await queueTransaction(accounts[0], accounts[1], 90000, web3.utils.toWei(new BN(3), "ether"));
+    let tx2 = await queueTransaction(accounts[0], accounts[1], 90000, to.wei(new BN(3), "ether"));
     let receipt2 = await web3.eth.getTransactionReceipt(tx2);
     assert.strictEqual(receipt2, null);
 
@@ -170,11 +170,11 @@ describe("Mining", function() {
     await stopMining();
     let blockNumber = await getBlockNumber();
 
-    let tx1 = await queueTransaction(accounts[0], accounts[1], 4000000, web3.utils.toWei(new BN(2), "ether"));
+    let tx1 = await queueTransaction(accounts[0], accounts[1], 4000000, to.wei(new BN(2), "ether"));
     let receipt1 = await web3.eth.getTransactionReceipt(tx1);
     assert.strictEqual(receipt1, null);
 
-    let tx2 = await queueTransaction(accounts[0], accounts[1], 4000000, web3.utils.toWei(new BN(3), "ether"));
+    let tx2 = await queueTransaction(accounts[0], accounts[1], 4000000, to.wei(new BN(3), "ether"));
     let receipt2 = await web3.eth.getTransactionReceipt(tx2);
     assert.strictEqual(receipt2, null);
 
@@ -209,11 +209,11 @@ describe("Mining", function() {
 
       await stopMining();
       let blockNumber = await getBlockNumber();
-      let tx1 = await queueTransaction(accounts[0], accounts[1], 4000000, web3.utils.toWei(new BN(2), "ether"));
+      let tx1 = await queueTransaction(accounts[0], accounts[1], 4000000, to.wei(new BN(2), "ether"));
       let receipt1 = await web3.eth.getTransactionReceipt(tx1);
       assert.strictEqual(receipt1, null);
 
-      let tx2 = await queueTransaction(accounts[0], accounts[1], 4000000, web3.utils.toWei(new BN(3), "ether"));
+      let tx2 = await queueTransaction(accounts[0], accounts[1], 4000000, to.wei(new BN(3), "ether"));
       let receipt2 = await web3.eth.getTransactionReceipt(tx2);
       assert.strictEqual(receipt2, null);
 
@@ -236,7 +236,7 @@ describe("Mining", function() {
   it("should error if queued transaction exceeds the block gas limit", async function() {
     try {
       await stopMining();
-      await queueTransaction(accounts[0], accounts[1], 10000000, web3.utils.toWei(new BN(2), "ether"));
+      await queueTransaction(accounts[0], accounts[1], 10000000, to.wei(new BN(2), "ether"));
       assert.fail("Transaction was processed without erroring; gas limit should have been too high");
     } catch (err) {
       // We caught an error like we expected. Ensure it's the right error, or rethrow.
@@ -339,7 +339,7 @@ describe("Mining", function() {
       let code = await getCode(receiptTx2.contractAddress);
 
       // Convert hex to a big number and ensure it's not zero.
-      assert(web3.utils.toBN(code).eq(0) === false);
+      assert(to.BN(code).eq(0) === false);
     }
   });
 

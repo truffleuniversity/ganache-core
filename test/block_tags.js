@@ -86,8 +86,8 @@ describe("Block Tags", function() {
 
     // Check that the balance incremented with the block number, just to be sure.
     const newBalance = await web3.eth.getBalance(accounts[0], initialBlockNumber + 1);
-    const initialBalanceInEther = parseFloat(web3.utils.fromWei(initial.balance, "ether"));
-    const balanceInEther = parseFloat(web3.utils.fromWei(newBalance, "ether"));
+    const initialBalanceInEther = parseFloat(to.ether(initial.balance, "wei"));
+    const balanceInEther = parseFloat(to.ether(newBalance, "wei"));
     assert(balanceInEther < initialBalanceInEther);
   });
 

@@ -12,8 +12,7 @@ var logger = {
   }
 };
 
-var web3 = new Web3();
-web3.setProvider(
+var web3 = new Web3(
   Ganache.provider({
     /* blockTime: 100, */
     logger: logger,

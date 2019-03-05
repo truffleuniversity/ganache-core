@@ -4,17 +4,18 @@ var Web3 = require("web3");
 var assert = require("assert");
 const bootstrap = require("./helpers/contract/bootstrap");
 const send = require("./helpers/utils/rpc");
+const to = require("../lib/utils/to.js");
 
 describe("Checkpointing / Reverting", function() {
   var provider;
   var accounts;
-  var web3 = new Web3();
+  var web3;
   var startingBalance;
   var snapshotId;
 
   before("create provider", function() {
     provider = Ganache.provider();
-    web3.setProvider(provider);
+    web3 = new Web3(provider);
   });
 
   before("get accounts", function(done) {
@@ -32,7 +33,7 @@ describe("Checkpointing / Reverting", function() {
       {
         from: accounts[0],
         to: accounts[1],
-        value: web3.utils.toWei(new BN(1), "ether"),
+        value: to.wei(new BN(1), "ether"),
         gas: 90000
       },
       function() {
@@ -42,7 +43,7 @@ describe("Checkpointing / Reverting", function() {
             return done(err);
           }
 
-          balance = parseFloat(web3.utils.fromWei(balance, "ether"));
+          balance = parseFloat(to.ether(balance, "wei"));
 
           // Assert the starting balance is where we think it is, including tx costs.
           assert(balance > 98.9 && balance < 99);
@@ -76,7 +77,7 @@ describe("Checkpointing / Reverting", function() {
       {
         from: accounts[0],
         to: accounts[1],
-        value: web3.utils.toWei(new BN(1), "ether"),
+        value: to.wei(new BN(1), "ether"),
         gas: 90000
       },
       function(err, txHash) {
@@ -90,7 +91,7 @@ describe("Checkpointing / Reverting", function() {
             return done(err);
           }
 
-          balance = parseFloat(web3.utils.fromWei(balance, "ether"));
+          balance = parseFloat(to.ether(balance, "wei"));
 
           // Assert the starting balance is where we think it is, including tx costs.
           assert(balance > 97.9 && balance < 98);
@@ -115,7 +116,7 @@ describe("Checkpointing / Reverting", function() {
                   return done(err);
                 }
 
-                balance = parseFloat(web3.utils.fromWei(balance, "ether"));
+                balance = parseFloat(to.ether(balance, "wei"));
 
                 assert(balance === startingBalance, "Should have reverted back to the starting balance");
 

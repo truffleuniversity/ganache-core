@@ -1,11 +1,12 @@
 var Web3 = require("web3");
-var Web3WsProvider = require("web3-providers-ws");
+var Web3WsProvider = Web3.providers.WebsocketProvider;
 var assert = require("assert");
 var Ganache = require(process.env.TEST_BUILD
   ? "../build/ganache.core." + process.env.TEST_BUILD + ".js"
   : "../index.js");
 var fs = require("fs");
 var solc = require("solc");
+var to = require("../lib/utils/to");
 
 var logger = {
   log: function(msg) {
@@ -27,8 +28,8 @@ describe("Contract Deployed on Main Chain After Fork", function() {
   var forkedServer;
   var mainAccounts;
 
-  var forkedWeb3 = new Web3();
-  var mainWeb3 = new Web3();
+  var forkedWeb3;
+  var mainWeb3;
 
   var forkedTargetUrl = "ws://localhost:21345";
 
@@ -79,11 +80,11 @@ describe("Contract Deployed on Main Chain After Fork", function() {
   });
 
   before("set forkedWeb3 provider", function() {
-    forkedWeb3.setProvider(new Web3WsProvider(forkedTargetUrl));
+    forkedWeb3 = new Web3(new Web3WsProvider(forkedTargetUrl));
   });
 
   before("Set main web3 provider, forking from forked chain at this point", function() {
-    mainWeb3.setProvider(
+    mainWeb3 = new Web3(
       Ganache.provider({
         fork: forkedTargetUrl.replace("ws", "http"),
         logger,
@@ -105,7 +106,7 @@ describe("Contract Deployed on Main Chain After Fork", function() {
       from: mainAccounts[0],
       data: contract.binary,
       gas: 3141592,
-      value: mainWeb3.utils.toWei("1", "ether")
+      value: to.wei("1", "ether")
     });
 
     contractAddress = receipt.contractAddress;
@@ -120,7 +121,7 @@ describe("Contract Deployed on Main Chain After Fork", function() {
   it("should send 1 ether to the created contract, checked on the forked chain", async function() {
     const balance = await mainWeb3.eth.getBalance(contractAddress);
 
-    assert.strictEqual(balance, mainWeb3.utils.toWei("1", "ether"));
+    assert.strictEqual(balance, to.wei("1", "ether"));
   });
 
   after("Shutdown server", function(done) {

@@ -1,6 +1,6 @@
 const Web3 = require("web3");
-const BN = Web3.utils.BN;
-const Web3WsProvider = require("web3-providers-ws");
+const BN = require("bn.js");
+const Web3WsProvider = Web3.providers.WebsocketProvider;
 const Transaction = require("../lib/utils/transaction");
 const BlockHeader = require("ethereumjs-block/header");
 const utils = require("ethereumjs-util");
@@ -301,8 +301,7 @@ const tests = function(web3) {
 
     // Load account.
     before(async function() {
-      signingWeb3 = new Web3();
-      signingWeb3.setProvider(
+      signingWeb3 = new Web3(
         Ganache.provider({
           accounts: [acc]
         })
@@ -362,13 +361,12 @@ const tests = function(web3) {
     // Account based on https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
     const acc = {
       balance: "0x0",
-      secretKey: web3.utils.sha3("cow")
+      secretKey: to.keccak256("cow")
     };
 
     // Load account.
     before(async function() {
-      signingWeb3 = new Web3();
-      signingWeb3.setProvider(
+      signingWeb3 = new Web3(
         Ganache.provider({
           accounts: [acc]
         })
@@ -1486,7 +1484,7 @@ const tests = function(web3) {
         id: new Date().getTime()
       });
 
-      assert.strictEqual(result.result, web3.utils.sha3(input));
+      assert.strictEqual(result.result, to.keccak256(input));
     });
   });
 
@@ -1560,8 +1558,7 @@ const logger = {
 
 describe("Provider:", function() {
   const Web3 = require("web3");
-  const web3 = new Web3();
-  web3.setProvider(
+  const web3 = new Web3(
     Ganache.provider({
       logger: logger,
       seed: "1337"
@@ -1579,7 +1576,7 @@ describe("Provider:", function() {
 
 describe("HTTP Server:", function() {
   const Web3 = require("web3");
-  const web3 = new Web3();
+  let web3;
   const port = 12345;
   let server;
 
@@ -1591,7 +1588,7 @@ describe("HTTP Server:", function() {
     });
 
     await pify(server.listen)(port);
-    web3.setProvider(new Web3.providers.HttpProvider("http://localhost:" + port));
+    web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:" + port));
   });
 
   after("Shutdown server", async function() {
@@ -1603,7 +1600,7 @@ describe("HTTP Server:", function() {
 
 describe("WebSockets Server:", function() {
   const Web3 = require("web3");
-  const web3 = new Web3();
+  let web3;
   const port = 12345;
   let server;
 
@@ -1615,7 +1612,7 @@ describe("WebSockets Server:", function() {
     });
     await pify(server.listen)(port);
     const provider = new Web3WsProvider("ws://localhost:" + port);
-    web3.setProvider(provider);
+    web3 = new Web3(provider);
   });
 
   tests(web3);

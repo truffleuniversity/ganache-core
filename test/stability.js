@@ -7,17 +7,18 @@ var Ganache = require(process.env.TEST_BUILD
   : "../index.js");
 var utils = require("ethereumjs-util");
 var pify = require("pify");
+var to = require("../lib/utils/to");
 
 var regex = matchers.regex;
 
 describe("stability", function(done) {
-  var web3 = new Web3();
+  var web3;
   var provider;
   var accounts;
 
   before("Initialize the provider", function() {
     provider = Ganache.provider({});
-    web3.setProvider(provider);
+    web3 = new Web3(provider);
   });
 
   before(function(done) {
@@ -53,7 +54,7 @@ describe("stability", function(done) {
         {
           from: accounts[0],
           to: accounts[1],
-          value: web3.utils.toWei(new BN(1), "ether")
+          value: to.wei(new BN(1), "ether")
         },
         txHandler
       );
@@ -68,7 +69,7 @@ describe("stability", function(done) {
       let req = web3.eth.sendTransaction.request({
         from: accounts[0],
         to: accounts[1],
-        value: web3.utils.toWei(new BN(1), "ether")
+        value: to.wei(new BN(1), "ether")
       });
 
       req.jsonrpc = "2.0";
@@ -138,13 +139,13 @@ describe("stability", function(done) {
 
   // TODO: remove `.skip` when working on and/or submitting fix for issue #453
   describe.skip("race conditions", function(done) {
-    var web3 = new Web3();
+    var web3;
     var provider;
     var accounts;
 
     before("initialize the provider", function() {
       provider = Ganache.provider({});
-      web3.setProvider(provider);
+      web3 = new Web3(provider);
     });
 
     before("get accounts", function(done) {

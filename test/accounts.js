@@ -4,14 +4,14 @@ var Ganache = require(process.env.TEST_BUILD
   ? "../build/ganache.core." + process.env.TEST_BUILD + ".js"
   : "../index.js");
 var assert = require("assert");
+var to = require("../lib/utils/to.js");
 
 describe("Accounts", function() {
   var expectedAddress = "0x604a95C9165Bc95aE016a5299dd7d400dDDBEa9A";
   var mnemonic = "into trim cross then helmet popular suit hammer cart shrug oval student";
 
   it("should respect the BIP99 mnemonic", function(done) {
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         mnemonic: mnemonic
       })
@@ -28,8 +28,7 @@ describe("Accounts", function() {
   });
 
   it("should lock all accounts when specified", function(done) {
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         mnemonic: mnemonic,
         secure: true
@@ -40,7 +39,7 @@ describe("Accounts", function() {
       {
         from: expectedAddress,
         to: "0x1234567890123456789012345678901234567890", // doesn't need to exist
-        value: web3.utils.toWei(new BN(1), "ether"),
+        value: to.wei(new BN(1), "ether"),
         gasLimit: 90000
       },
       function(err) {
@@ -56,8 +55,7 @@ describe("Accounts", function() {
   });
 
   it("should unlock specified accounts, in conjunction with --secure", function(done) {
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         mnemonic: mnemonic,
         secure: true,
@@ -69,7 +67,7 @@ describe("Accounts", function() {
       {
         from: expectedAddress,
         to: "0x1234567890123456789012345678901234567890", // doesn't need to exist
-        value: web3.utils.toWei(new BN(1), "ether"),
+        value: to.wei(new BN(1), "ether"),
         gasLimit: 90000
       },
       function(err, tx) {
@@ -83,8 +81,7 @@ describe("Accounts", function() {
   });
 
   it("should unlock specified accounts, in conjunction with --secure, using array indexes", function(done) {
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         mnemonic: mnemonic,
         secure: true,
@@ -96,7 +93,7 @@ describe("Accounts", function() {
       {
         from: expectedAddress,
         to: "0x1234567890123456789012345678901234567890", // doesn't need to exist
-        value: web3.utils.toWei(new BN(1), "ether"),
+        value: to.wei(new BN(1), "ether"),
         gasLimit: 90000
       },
       function(err, tx) {
@@ -112,8 +109,7 @@ describe("Accounts", function() {
   it("should unlock accounts even if private key isn't managed by the testrpc (impersonation)", function() {
     var secondAddress = "0x1234567890123456789012345678901234567890";
 
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         mnemonic: mnemonic,
         secure: true,
@@ -126,7 +122,7 @@ describe("Accounts", function() {
       .sendTransaction({
         from: expectedAddress,
         to: secondAddress,
-        value: web3.utils.toWei(new BN(10), "ether"),
+        value: to.wei(new BN(10), "ether"),
         gasLimit: 90000
       })
       .then(() => {
@@ -134,7 +130,7 @@ describe("Accounts", function() {
         return web3.eth.sendTransaction({
           from: secondAddress,
           to: expectedAddress,
-          value: web3.utils.toWei(new BN(5), "ether"),
+          value: to.wei(new BN(5), "ether"),
           gasLimit: 90000
         });
       })
@@ -143,7 +139,7 @@ describe("Accounts", function() {
         return web3.eth.getBalance(secondAddress);
       })
       .then((balance) => {
-        var balanceInEther = web3.utils.fromWei(new BN(balance), "ether");
+        var balanceInEther = to.ether(new BN(balance), "wei");
 
         if (typeof balanceInEther === "string") {
           balanceInEther = parseFloat(balanceInEther);
@@ -160,8 +156,7 @@ describe("Accounts", function() {
   it("errors when we try to sign a transaction from an account we're impersonating", function() {
     var secondAddress = "0x1234567890123456789012345678901234567890";
 
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         mnemonic: mnemonic,
         secure: true,
@@ -180,8 +175,7 @@ describe("Accounts", function() {
   });
 
   it("should create a 2 accounts when passing an object to provider", function(done) {
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         accounts: [{ balance: "0x12" }, { balance: "0x13" }]
       })
@@ -197,8 +191,7 @@ describe("Accounts", function() {
   });
 
   it("should create a 7 accounts when ", function(done) {
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         total_accounts: 7
       })
@@ -214,8 +207,7 @@ describe("Accounts", function() {
   });
 
   it("should respect the default_balance_ether option", function(done) {
-    var web3 = new Web3();
-    web3.setProvider(
+    var web3 = new Web3(
       Ganache.provider({
         default_balance_ether: 1.23456
       })
@@ -233,7 +225,7 @@ describe("Accounts", function() {
               return reject(err);
             }
 
-            var balanceInEther = web3.utils.fromWei(balance, "Ether");
+            var balanceInEther = to.ether(balance, "wei");
 
             assert.strictEqual(balanceInEther, "1.23456");
             return resolve(balance);

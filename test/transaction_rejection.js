@@ -109,7 +109,7 @@ describe("Transaction rejection", function() {
   it("should reject transaction if insufficient funds", function(done) {
     testTransactionForRejection(
       {
-        value: web3.utils.toWei("100000", "ether")
+        value: to.wei("100000", "ether")
       },
       /sender doesn't have enough funds to send tx/,
       done

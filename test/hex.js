@@ -69,9 +69,8 @@ function noLeadingZeros(method, result, path) {
 }
 
 describe("JSON-RPC Response", function() {
-  var web3 = new Web3();
   var provider = Ganache.provider();
-  web3.setProvider(provider);
+  var web3 = new Web3(provider);
 
   var accounts;
   before(function(done) {

@@ -59,7 +59,7 @@ const testWebSocket = function(web3) {
 
 describe("WebSockets Server:", function() {
   const Web3 = require("web3");
-  const web3 = new Web3();
+  let web3;
   let server;
 
   before("Initialize Ganache server", async function() {
@@ -68,7 +68,7 @@ describe("WebSockets Server:", function() {
     });
     await promisify(server.listen)(PORT + 1);
     const provider = new Web3.providers.WebsocketProvider("ws://localhost:" + (PORT + 1));
-    web3.setProvider(provider);
+    web3 = new Web3(provider);
   });
 
   testWebSocket(web3);
@@ -83,7 +83,7 @@ describe("WebSockets Server:", function() {
 
 describe("HTTP Server should not handle subscriptions:", function() {
   const Web3 = require("web3");
-  const web3 = new Web3();
+  let web3;
   let server;
 
   before("Initialize Ganache server", async function() {
@@ -92,7 +92,7 @@ describe("HTTP Server should not handle subscriptions:", function() {
     });
 
     await promisify(server.listen)(PORT);
-    web3.setProvider(new Web3.providers.HttpProvider(HTTPADDRESS));
+    web3 = new Web3(new Web3.providers.HttpProvider(HTTPADDRESS));
   });
 
   testHttp(web3);

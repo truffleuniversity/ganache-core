@@ -5,6 +5,7 @@ var Ganache = require(process.env.TEST_BUILD
   : "../index.js");
 var assert = require("assert");
 var solc = require("solc");
+var to = require("../lib/utils/to");
 
 describe("Interval Mining", function() {
   var web3;
@@ -68,7 +69,7 @@ describe("Interval Mining", function() {
         {
           from: firstAddress,
           to: "0x1234567890123456789012345678901234567890",
-          value: web3.utils.toWei(new BN(1), "ether"),
+          value: to.wei(new BN(1), "ether"),
           gas: 90000
         },
         function(err, tx) {

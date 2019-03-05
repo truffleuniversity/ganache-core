@@ -1,5 +1,5 @@
 var Web3 = require("web3");
-var Web3WsProvider = require("web3-providers-ws");
+var Web3WsProvider = Web3.providers.WebsocketProvider;
 var Ganache = require(process.env.TEST_BUILD
   ? "../build/ganache.core." + process.env.TEST_BUILD + ".js"
   : "../index.js");
@@ -293,8 +293,7 @@ var logger = {
 };
 
 describe("Provider:", function() {
-  var web3 = new Web3();
-  web3.setProvider(
+  var web3 = new Web3(
     Ganache.provider({
       logger: logger
     })
@@ -303,7 +302,7 @@ describe("Provider:", function() {
 });
 
 describe("Server:", function(done) {
-  var web3 = new Web3();
+  var web3;
   var port = 12345;
   var server;
 
@@ -313,7 +312,7 @@ describe("Server:", function(done) {
       ws: true
     });
     server.listen(port, function() {
-      web3.setProvider(new Web3WsProvider("ws://localhost:" + port));
+      web3 = new Web3(new Web3WsProvider("ws://localhost:" + port));
       done();
     });
   });

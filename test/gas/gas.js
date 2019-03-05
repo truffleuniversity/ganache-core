@@ -7,6 +7,7 @@ const randomInteger = require("../helpers/utils/generateRandomInteger");
 const testTransactionEstimate = require("./lib/transactionEstimate");
 const toBytesHexString = require("../helpers/utils/toBytesHexString");
 const { deploy } = require("../helpers/contract/compileAndDeploy");
+const to = require("../../lib/utils/to");
 
 const SEED_RANGE = 1000000;
 const RSCLEAR_REFUND = 15000;
@@ -466,7 +467,7 @@ describe("Gas", function() {
 
         it("matches usage for simple account to account transfer", async function() {
           const { accounts, web3 } = context;
-          const transferAmount = web3.utils.toBN(web3.utils.toWei("5", "finney"));
+          const transferAmount = to.wei("5", "finney");
           const transactionData = {
             from: accounts[0],
             to: accounts[1],

@@ -38,7 +38,7 @@ const contract = {
 
 const runTests = function(providerInit) {
   describe("Persistence ", function() {
-    const web3 = new Web3();
+    let web3;
     let accounts;
     let tx;
     let provider;
@@ -46,7 +46,7 @@ const runTests = function(providerInit) {
     before("init provider", function() {
       providerInit(function(p) {
         provider = p;
-        web3.setProvider(p);
+        web3 = new Web3(p);
       });
     });
 
@@ -101,8 +101,8 @@ const runTests = function(providerInit) {
 
 const runRegressionTests = function(regressionProviderInit, memdbProviderInit) {
   describe("Verify previous db compatibility", function() {
-    const web3 = new Web3();
-    const memdbWeb3 = new Web3();
+    let web3;
+    let memdbWeb3;
     const str = JSON.stringify;
     const memdbBlocks = [];
     const blocks = [];
@@ -112,10 +112,10 @@ const runRegressionTests = function(regressionProviderInit, memdbProviderInit) {
 
     before("init provider", function() {
       regressionProviderInit(function(p) {
-        web3.setProvider(p);
+        web3 = new Web3(p);
       });
       memdbProviderInit(function(p) {
-        memdbWeb3.setProvider(p);
+        memdbWeb3 = new Web3(p);
         memdbSend = send(p);
       });
     });

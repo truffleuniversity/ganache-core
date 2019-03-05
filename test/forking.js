@@ -1,5 +1,5 @@
 var Web3 = require("web3");
-var Web3WsProvider = require("web3-providers-ws");
+var Web3WsProvider = Web3.providers.WebsocketProvider;
 var assert = require("assert");
 var Ganache = require(process.env.TEST_BUILD
   ? "../build/ganache.core." + process.env.TEST_BUILD + ".js"
@@ -32,8 +32,8 @@ describe("Forking", function() {
 
   var initialFallbackAccountState = {};
 
-  var forkedWeb3 = new Web3();
-  var mainWeb3 = new Web3();
+  var forkedWeb3;
+  var mainWeb3;
 
   var forkedWeb3NetworkId = Date.now();
   var forkedWeb3Port = 21345;
@@ -84,7 +84,7 @@ describe("Forking", function() {
   });
 
   before("set forkedWeb3 provider", () => {
-    forkedWeb3.setProvider(new Web3WsProvider(forkedTargetUrl));
+    forkedWeb3 = new Web3(new Web3WsProvider(forkedTargetUrl));
   });
 
   before("Gather forked accounts", async() => {
@@ -189,18 +189,18 @@ describe("Forking", function() {
 
   it("should get storage values on the forked provider via the main provider", async() => {
     const result = await mainWeb3.eth.getStorageAt(contractAddress, contract.position_of_value);
-    assert.strictEqual(mainWeb3.utils.hexToNumber(result), 7);
+    assert.strictEqual(to.number(result), 7);
   });
 
   it("should execute calls against a contract on the forked provider via the main provider", async() => {
     var example = new mainWeb3.eth.Contract(JSON.parse(contract.abi), contractAddress);
 
     const result = await example.methods.value().call({ from: mainAccounts[0] });
-    assert.strictEqual(mainWeb3.utils.hexToNumber(result), 7);
+    assert.strictEqual(to.number(result), 7);
 
     // Make the call again to ensure caches updated and the call still works.
     const result2 = await example.methods.value().call({ from: mainAccounts[0] });
-    assert.strictEqual(mainWeb3.utils.hexToNumber(result2), 7);
+    assert.strictEqual(to.number(result2), 7);
   });
 
   it("should make a transaction on the main provider while not transacting on the forked provider", async() => {
@@ -217,11 +217,11 @@ describe("Forking", function() {
 
     // It insta-mines, so we can make a call directly after.
     const result = await example.methods.value().call({ from: mainAccounts[0] });
-    assert.strictEqual(mainWeb3.utils.hexToNumber(result), 25);
+    assert.strictEqual(to.number(result), 25);
 
     // Now call back to the forked to ensure it's value stayed 5
     const forkedResult = await forkedExample.methods.value().call({ from: forkedAccounts[0] });
-    assert.strictEqual(forkedWeb3.utils.hexToNumber(forkedResult), 7);
+    assert.strictEqual(to.number(forkedResult), 7);
   });
 
   it("should ignore continued transactions on the forked blockchain by pegging the forked block number", async() => {
@@ -244,11 +244,11 @@ describe("Forking", function() {
     await forkedExample.methods.setValue(800).send({ from: forkedAccounts[0] });
     // Let's assert the value was set correctly.
     const result = await forkedExample.methods.value().call({ from: forkedAccounts[0] });
-    assert.strictEqual(forkedWeb3.utils.hexToNumber(result), 800);
+    assert.strictEqual(to.number(result), 800);
 
     // Now lets check the value on the main chain. It shouldn't be 800.
     const mainResult = await example.methods.value().call({ from: mainAccounts[0] });
-    assert.strictEqual(mainWeb3.utils.hexToNumber(mainResult), 5);
+    assert.strictEqual(to.number(mainResult), 5);
   });
 
   it("should maintain a block number that includes new blocks PLUS the existing chain", async() => {
@@ -260,7 +260,7 @@ describe("Forking", function() {
     // - Then the main chain performed a transaction, putting it at block 5.
 
     const result = await mainWeb3.eth.getBlockNumber();
-    assert.strictEqual(mainWeb3.utils.hexToNumber(result), 5);
+    assert.strictEqual(to.number(result), 5);
 
     // Now lets get a block that exists on the forked chain.
     const mainBlock = await mainWeb3.eth.getBlock(0);
@@ -277,7 +277,7 @@ describe("Forking", function() {
   it("should have a genesis block whose parent is the last block from the forked provider", async() => {
     const forkedBlock = await forkedWeb3.eth.getBlock(forkBlockNumber);
     const parentHash = forkedBlock.hash;
-    const mainGenesisNumber = mainWeb3.utils.hexToNumber(forkBlockNumber) + 1;
+    const mainGenesisNumber = to.number(forkBlockNumber) + 1;
     const mainGenesis = await mainWeb3.eth.getBlock(mainGenesisNumber);
     assert.strictEqual(mainGenesis.parentHash, parentHash);
   });
@@ -366,7 +366,7 @@ describe("Forking", function() {
         forkedWeb3.eth.getBalance(forkedAccounts[0], "latest")
       ]))
     ].map(function(el) {
-      return mainWeb3.utils.toBN(el);
+      return to.BN(el);
     });
 
     // First ensure our balances for the block before the fork
